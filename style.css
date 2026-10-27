@@ -251,3 +251,20 @@ select:disabled { background: var(--line-2); color: var(--muted); }
 .result-card .short-out { margin-top: 12px; }
 #metaOut .mini-label:first-child { margin-top: 0; }
 #contentReq:not(.on) { color: var(--muted); background: var(--line-2); }
+
+/* ── v3 ── */
+.sub { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.sub small { font-size: 11.5px; color: var(--text-2); font-weight: 600; }
+.row.two-one { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+.row.four { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.notice { padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+.notice.blocked { background: var(--warn-bg); color: #6B4500; }
+.notice.forbidden { background: var(--err-bg); color: #8A1C1C; }
+.notice b { display: block; margin-bottom: 2px; }
+.form .label em.req.on { color: var(--orange); background: var(--orange-soft); }
+.is-off { display: none !important; }
+@media (max-width: 640px) {
+  .row.four { grid-template-columns: 1fr 1fr; }
+  .row.two-one { grid-template-columns: 1fr; }
+}
+.form .label em.req:not(.on) { color: var(--muted); background: var(--line-2); }

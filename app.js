@@ -44,26 +44,38 @@
   }
 
   /* ── 초기화 ── */
+  const opts = (list, ph, short) => (ph ? `<option value="">${ph}</option>` : "") + active(list).map((x) => `<option value="${esc(x.code)}">${esc(x.label)}${short ? "" : ` (${esc(x.code)})`}</option>`).join("");
   function init() {
-    $("channel").innerHTML = `<option value="">매체 선택</option>` + P.channels.filter((c) => !c.deprecated).map((c) => `<option value="${esc(c.id)}">${esc(c.label)}</option>`).join("");
-    $("cPromotion").innerHTML = active(P.promotions).map((x) => `<option value="${esc(x.code)}">${esc(x.label)} (${esc(x.code)})</option>`).join("");
-    $("cProduct").innerHTML = active(P.products).map((x) => `<option value="${esc(x.code)}">${esc(x.label)} (${esc(x.code)})</option>`).join("");
+    const groups = [...new Set(P.channels.map((c) => c.group))];
+    $("channel").innerHTML = `<option value="">선택하세요</option>` + groups.map((g) =>
+      `<optgroup label="${esc(g)}">${P.channels.filter((c) => c.group === g && !c.deprecated).map((c) => `<option value="${esc(c.id)}">${esc(c.label)}</option>`).join("")}</optgroup>`).join("");
+    $("cObjective").innerHTML = opts(P.objectives, "", true);
+    $("cPromotion").innerHTML = opts(P.promotions, "", true);
+    $("cProduct").innerHTML = opts(P.products, "전 상품", true);
+    $("cFormat").innerHTML = opts(P.formats, "형식");
+    $("tType").innerHTML = opts(P.targets, "선택 안 함");
     $("cDate").value = todayISO();
   }
 
   /* ── 값 수집 ── */
   function collect() {
     const ch = channelById($("channel").value);
-    const source = ch ? (ch.custom ? R.sanitize($("customSource").value) : ch.source) : "";
-    const typed = R.sanitize($("content").value);
-    let content = typed;
-    if (ch && ch.content !== "required" && ch.content !== "optional") content = typed ? `${ch.content}_${typed}` : ch.content;
-    const campaign = [$("cPromotion").value, $("cProduct").value, yymmdd($("cDate").value)].every(Boolean)
-      ? [$("cPromotion").value, $("cProduct").value, yymmdd($("cDate").value)].join("_") : "";
+    const fixed = ch && !["required", "optional"].includes(ch.content) ? ch.content : "";
+    const source = ch && !ch.status ? (ch.custom ? R.sanitize($("customSource").value) : ch.source) : "";
+    const name = R.sanitize($("cName").value);
+    const format = fixed || $("cFormat").value;
+    const content = name && format ? `${name}_${format}` : fixed ? (name ? `${name}_${fixed}` : fixed) : "";
+    const camp = [yymmdd($("cDate").value), $("cObjective").value, $("cPromotion").value];
+    const campaign = camp.every(Boolean) ? [...camp, $("cProduct").value].filter(Boolean).join("_") : "";
+    let term = "";
+    if (ch && ch.term === "keyword") term = $("tKeyword").value.trim();
+    else if (ch && ch.term === "target" && $("tType").value) {
+      const d = R.sanitize($("tDetail").value);
+      term = d ? `${$("tType").value}_${d}` : $("tType").value;
+    }
     return {
-      landing: $("landing").value.trim(),
-      ch, source, medium: ch ? ch.medium : "", campaign, content,
-      contentRaw: $("content").value,
+      landing: $("landing").value.trim(), ch, source, medium: ch && !ch.status ? ch.medium : "",
+      campaign, content, term, name, format, fixed, nameRaw: $("cName").value,
       metaMode: !!(ch && ch.meta && $("metaMode").checked)
     };
   }
@@ -71,26 +83,30 @@
   /* ── 생성 ── */
   function build(v) {
     const res = { dest: v.landing ? R.destType(v.landing) : "", url: "", checks: [], ready: false };
+    if (v.ch && v.ch.status) return res; // 불가 위치: 안내만
     const need = [];
     if (!v.landing) need.push("랜딩 URL");
-    if (!v.ch) need.push("매체");
+    if (!v.ch) need.push("링크 위치");
     if (v.ch && v.ch.custom && !v.source) need.push("크리에이터 ID");
-    if (v.ch && v.ch.content === "required" && !v.content && !v.metaMode) need.push("소재명");
-    if (need.length) { res.checks.push({ level: "pending", text: `${need.join(" · ")} 입력이 필요합니다.` }); }
+    if (!v.campaign) need.push("캠페인");
+    if (v.ch && !v.metaMode && !v.fixed) {
+      if (v.ch.content === "required" && !v.name) need.push("소재명");
+      if (v.name && !v.format) need.push("소재 형식");
+    }
+    if (need.length) res.checks.push({ level: "pending", text: `${need.join(" · ")} 입력이 필요합니다.` });
 
     if (res.dest === "invalid") res.checks.push({ level: "error", text: "URL 형식이 아닙니다. https:// 부터 입력하세요." });
     if (res.dest === "coupang") res.checks.push({ level: "error", text: "쿠팡 링크는 외부 파라미터로 유입 추적이 되지 않아 만들지 않습니다." });
     if (res.dest === "other") res.checks.push({ level: "warn", text: "자사몰 도메인이 아닙니다. 주소를 확인하세요." });
-    if (v.contentRaw && /[^a-zA-Z0-9_\s\-.]/.test(v.contentRaw)) res.checks.push({ level: "warn", text: "소재명의 한글·특수문자는 자동으로 빠졌습니다." });
+    if (v.nameRaw && /[^a-zA-Z0-9_\s\-.]/.test(v.nameRaw)) res.checks.push({ level: "warn", text: "소재명의 한글·특수문자는 자동으로 빠졌습니다." });
     if (v.campaign) res.checks.push(...R.checkCampaign(v.campaign));
-
     if (res.checks.some((c) => c.level === "error" || c.level === "pending")) return res;
 
     const u = new URL(v.landing);
     [...u.searchParams.keys()].forEach((k) => { if (/^(utm_|nt_)/.test(k)) u.searchParams.delete(k); });
 
     if (res.dest === "smartstore") {
-      [["nt_source", v.source], ["nt_medium", v.medium], ["nt_detail", v.campaign], ["nt_keyword", v.content]]
+      [["nt_source", v.source], ["nt_medium", v.medium], ["nt_detail", v.campaign], ["nt_keyword", v.content || v.term]]
         .forEach(([k, val]) => val && u.searchParams.set(k, val));
       res.checks.push({ level: "info", text: "스마트스토어 링크라 nt_ 파라미터로 만들었습니다. (스마트스토어센터 > 통계 > 마케팅분석)" });
     } else if (v.metaMode) {
@@ -100,10 +116,12 @@
       res.ready = true;
       return res;
     } else {
-      [["utm_source", v.source], ["utm_medium", v.medium], ["utm_campaign", v.campaign], ["utm_content", v.content]]
+      [["utm_source", v.source], ["utm_medium", v.medium], ["utm_campaign", v.campaign], ["utm_content", v.content], ["utm_term", v.term]]
         .forEach(([k, val]) => val && u.searchParams.set(k, val));
     }
     res.url = u.toString();
+    if (v.ch.short && short.for !== res.url) res.checks.push({ level: "info", text: "링크가 그대로 노출되는 위치입니다. '단축 URL'로 짧게 만들어 넣으세요." });
+    if (v.ch.qr) res.checks.push({ level: "info", text: "오프라인용입니다. 'QR' 버튼으로 이미지를 저장하세요. (단축 URL을 먼저 만들면 QR이 더 단순해집니다)" });
     res.ready = true;
     return res;
   }
@@ -129,22 +147,40 @@
   function syncForm() {
     const ch = channelById($("channel").value);
     const dest = $("landing").value.trim() ? R.destType($("landing").value.trim()) : "";
+    const blocked = !!(ch && ch.status);
+
+    $("blockedNotice").hidden = !blocked;
+    if (blocked) {
+      $("blockedNotice").className = "notice " + ch.status;
+      $("blockedNotice").innerHTML = `<b>${ch.status === "forbidden" ? "UTM을 넣으면 안 되는 위치입니다." : "UTM을 넣을 수 없는 위치입니다."}</b>${esc(ch.reason)}<br>→ ${esc(ch.alt)}`;
+    }
+    ["campaignWrap", "contentWrap", "termWrap"].forEach((id) => $(id).classList.toggle("is-off", blocked));
     $("customSourceWrap").hidden = !(ch && ch.custom);
     const metaOk = !!(ch && ch.meta) && dest !== "smartstore";
     $("metaModeWrap").hidden = !metaOk;
     if (!metaOk) $("metaMode").checked = false;
     const meta = $("metaMode").checked;
 
-    $("channelInfo").textContent = ch ? `utm_source=${ch.custom ? "크리에이터ID" : ch.source} · utm_medium=${ch.medium} · GA4 채널: ${ch.ga4}` : "";
-    const fixed = ch && ch.content !== "required" && ch.content !== "optional" ? ch.content : "";
+    $("channelInfo").textContent = ch && !blocked ? `utm_source=${ch.custom ? "크리에이터ID" : ch.source} · utm_medium=${ch.medium} · GA4 채널: ${ch.ga4}` : "";
+
+    const fixed = ch && !["required", "optional"].includes(ch.content) ? ch.content : "";
     $("contentWrap").hidden = meta;
-    $("contentPrefix").hidden = !fixed;
-    $("contentPrefix").textContent = fixed ? fixed + "_" : "";
-    $("contentReq").textContent = ch && ch.content === "required" ? "필수" : "선택";
-    $("contentReq").classList.toggle("on", !!(ch && ch.content === "required"));
+    $("cFormat").disabled = !!fixed;
+    if (fixed) $("cFormat").value = fixed;
+    else if ($("cFormat").dataset.fixed) $("cFormat").value = "";
+    $("cFormat").dataset.fixed = fixed;
+    const req = !!(ch && ch.content === "required");
+    $("contentReq").textContent = req ? "필수" : "선택";
+    $("contentReq").classList.toggle("on", req);
     $("contentHint").textContent = fixed
-      ? `비워두면 "${fixed}"로 들어갑니다. 여러 개를 구분할 때만 입력 (예: bf)`
-      : "영문으로 입력 (한글·공백은 자동 정리) · 예: video_doctor, image_price";
+      ? `형식은 "${fixed}"로 고정됩니다. 소재명은 여러 링크를 구분할 때만 입력 (예: event → event_${fixed})`
+      : "예: doctor + 영상 → doctor_video · 한글·공백은 자동 정리";
+
+    $("termWrap").hidden = meta || !(ch && ch.term);
+    const kw = !!(ch && ch.term === "keyword");
+    $("termTitle").textContent = kw ? "검색 키워드" : "타겟";
+    $("termTargetRow").hidden = kw;
+    $("termKeywordRow").hidden = !kw;
 
     const destText = { mall: "자사몰", smartstore: "스마트스토어 · nt_ 파라미터로 생성", coupang: "쿠팡 · 추적 불가", other: "미등록 도메인", invalid: "URL 형식 오류" }[dest] || "";
     $("destBadge").className = "dest " + dest;
@@ -162,7 +198,7 @@
     $("urlOut").hidden = isMeta;
     $("metaOut").hidden = !isMeta;
     if (isMeta) { $("metaWebsite").textContent = res.website; $("metaParams").textContent = res.metaParams; }
-    else $("urlOut").innerHTML = res.ready ? highlightUrl(res.url) : `<span class="placeholder">왼쪽 항목을 채우면 여기에 URL이 만들어집니다.</span>`;
+    else $("urlOut").innerHTML = res.ready ? highlightUrl(res.url) : `<span class="placeholder">${v.ch && v.ch.status ? "이 위치는 UTM 링크를 만들지 않습니다." : "왼쪽 항목을 채우면 여기에 URL이 만들어집니다."}</span>`;
 
     $("copyBtn").disabled = !res.ready;
     $("copyBtn").textContent = isMeta ? "URL 매개변수 복사" : "URL 복사";
@@ -175,8 +211,9 @@
 
     const err = res.checks.some((c) => c.level === "error");
     const warn = res.checks.some((c) => c.level === "warn");
-    $("statusBadge").className = "status " + (res.ready ? (warn ? "warn" : "ok") : err ? "error" : "pending");
-    $("statusBadge").textContent = res.ready ? (warn ? "확인 필요" : "완료") : err ? "수정 필요" : "작성 중";
+    const blk = !!(v.ch && v.ch.status);
+    $("statusBadge").className = "status " + (blk ? "error" : res.ready ? (warn ? "warn" : "ok") : err ? "error" : "pending");
+    $("statusBadge").textContent = blk ? "UTM 불가" : res.ready ? (warn ? "확인 필요" : "완료") : err ? "수정 필요" : "작성 중";
     renderChecks($("checkList"), res.checks);
   }
 
@@ -193,7 +230,7 @@
     list.unshift({
       id: prev ? prev.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       at: new Date().toISOString(),
-      channel: v.ch ? v.ch.label : "", source: v.source, medium: v.medium, campaign: v.campaign, content: v.metaMode ? "{{ad.name}}" : v.content,
+      channel: v.ch ? v.ch.label : "", source: v.source, medium: v.medium, campaign: v.metaMode ? "{{campaign.name}}" : v.campaign, content: v.metaMode ? "{{ad.name}}" : v.content, term: v.metaMode ? "{{adset.name}}" : v.term,
       landing: v.landing, url: res.url, metaParams: res.metaParams || "",
       shortUrl: short.for === res.url && short.url ? short.url : prev ? prev.shortUrl || "" : ""
     });
@@ -228,8 +265,8 @@
     const list = loadHist();
     if (!list.length) return toast("내보낼 기록이 없습니다.");
     const q = (s) => `"${String(s ?? "").replace(/"/g, '""')}"`;
-    const head = ["생성일시", "매체", "utm_source", "utm_medium", "utm_campaign", "utm_content", "랜딩 URL", "완성 URL", "단축 URL", "메타 URL 매개변수"];
-    const rows = list.map((x) => [fmtDate(x.at), x.channel, x.source, x.medium, x.campaign, x.content, x.landing, x.metaParams ? "" : x.url, x.shortUrl, x.metaParams].map(q).join(","));
+    const head = ["생성일시", "매체", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "랜딩 URL", "완성 URL", "단축 URL", "메타 URL 매개변수"];
+    const rows = list.map((x) => [fmtDate(x.at), x.channel, x.source, x.medium, x.campaign, x.content, x.term || "", x.landing, x.metaParams ? "" : x.url, x.shortUrl, x.metaParams].map(q).join(","));
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob(["﻿" + [head.map(q).join(","), ...rows].join("\r\n")], { type: "text/csv;charset=utf-8" }));
     a.download = `utm_links_${todayISO()}.csv`;
