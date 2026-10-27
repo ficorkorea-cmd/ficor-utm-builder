@@ -234,3 +234,20 @@ select:disabled { background: var(--line-2); color: var(--muted); }
   .short-row { flex-direction: column; }
 }
 .short-link { font-family: var(--mono); font-size: 12.5px; color: var(--orange); font-weight: 600; text-decoration: none; white-space: nowrap; }
+
+/* ── v2 간소화 레이아웃 ── */
+.form.block { gap: 22px; padding: 24px; }
+.form .label { font-size: 14px; color: var(--navy); font-weight: 700; gap: 8px; }
+.form .label code { font-weight: 500; font-size: 11.5px; }
+.form .dest, .form .hint { margin-top: 0; }
+.row.three > * { flex: 1; min-width: 0; }
+.prefix-input { display: flex; }
+.prefix { display: flex; align-items: center; padding: 0 10px; background: var(--line-2); border: 1px solid var(--line); border-right: 0; border-radius: 8px 0 0 8px; font-family: var(--mono); font-size: 13px; color: var(--navy); font-weight: 600; }
+.prefix:not([hidden]) + input { border-radius: 0 8px 8px 0; }
+.check { margin-top: -8px; }
+.check small { color: var(--text-2); font-weight: 400; }
+.checks:empty { display: none; }
+.result-card .checks { margin: 12px 0 0; }
+.result-card .short-out { margin-top: 12px; }
+#metaOut .mini-label:first-child { margin-top: 0; }
+#contentReq:not(.on) { color: var(--muted); background: var(--line-2); }

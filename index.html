@@ -26,99 +26,50 @@
 
   <main class="wrap">
 
-    <!-- ① URL 생성 ──────────────────────────────────── -->
+    <!-- ① URL 생성 -->
     <section class="panel is-active" id="tab-build">
       <div class="build-grid">
-        <form class="form" id="buildForm" autocomplete="off" onsubmit="return false">
+        <form class="form block" id="buildForm" autocomplete="off" onsubmit="return false">
 
-          <!-- 1. 랜딩 -->
-          <fieldset class="block">
-            <legend><span class="step">1</span>랜딩 페이지 <button type="button" class="help" data-help="landing">?</button></legend>
-            <div class="row">
-              <label class="field grow">
-                <span class="label">랜딩 URL <em class="req">필수</em></span>
-                <input type="url" id="landing" placeholder="https://ficor.kr/...">
-              </label>
-              <label class="field">
-                <span class="label">자주 쓰는 페이지</span>
-                <select id="landingPreset"><option value="">선택</option></select>
-              </label>
-            </div>
-            <div class="dest" id="destBadge"></div>
-          </fieldset>
+          <label class="field">
+            <span class="label"><span class="step">1</span>랜딩 URL</span>
+            <input type="url" id="landing" placeholder="https://ficor.kr/...">
+            <span class="dest" id="destBadge"></span>
+          </label>
 
-          <!-- 2. 매체 -->
-          <fieldset class="block">
-            <legend><span class="step">2</span>매체 <button type="button" class="help" data-help="source">?</button></legend>
-            <div class="row">
-              <label class="field">
-                <span class="label">utm_source <em class="req">필수</em></span>
-                <select id="source"><option value="">매체 선택</option></select>
-              </label>
-              <label class="field">
-                <span class="label">utm_medium <em class="req">필수</em></span>
-                <select id="medium" disabled><option value="">매체를 먼저 선택</option></select>
-              </label>
-            </div>
-            <label class="field" id="customSourceWrap" hidden>
-              <span class="label">크리에이터 ID <em class="req">필수</em></span>
-              <input type="text" id="customSource" placeholder="fit_jenny">
-              <span class="hint" id="customSourceHint"></span>
-            </label>
-            <div class="channel" id="channelInfo"></div>
-            <label class="check" id="metaModeWrap" hidden>
-              <input type="checkbox" id="metaMode">
-              <span><b>메타 URL 매개변수 모드</b> — 광고관리자의 캠페인·광고세트·광고 이름이 자동으로 들어가는 매크로로 생성</span>
-            </label>
-          </fieldset>
+          <label class="field">
+            <span class="label"><span class="step">2</span>어디에 거는 링크인가요?</span>
+            <select id="channel"><option value="">매체 선택</option></select>
+            <span class="hint" id="channelInfo"></span>
+          </label>
 
-          <!-- 3. 캠페인 -->
-          <fieldset class="block">
-            <legend><span class="step">3</span>캠페인 <code>목적_상품_프로모션_시작일</code> <button type="button" class="help" data-help="campaign">?</button></legend>
-            <div class="row four">
-              <label class="field"><span class="label">목적</span><select id="cObjective"></select></label>
-              <label class="field"><span class="label">상품</span><select id="cProduct"></select></label>
-              <label class="field"><span class="label">프로모션</span><select id="cPromotion"></select></label>
-              <label class="field"><span class="label">시작일</span><input type="date" id="cDate"></label>
-            </div>
-            <div class="seg-preview" id="campaignPreview"></div>
-            <p class="note" id="metaCampaignNote" hidden>메타 모드에서는 이 값을 <b>광고관리자 캠페인 이름</b>으로 그대로 사용하세요. <button type="button" class="link-btn" id="copyCampaignName">캠페인 이름 복사</button></p>
-          </fieldset>
+          <label class="field" id="customSourceWrap" hidden>
+            <span class="label">크리에이터 ID</span>
+            <input type="text" id="customSource" placeholder="영문 소문자 (예: fit_jenny)">
+          </label>
 
-          <!-- 4. 소재 -->
-          <fieldset class="block" id="contentBlock">
-            <legend><span class="step">4</span>소재 <code>형식_주제_버전</code> <em class="req" id="contentReqBadge">선택</em> <button type="button" class="help" data-help="content">?</button></legend>
+          <label class="check" id="metaModeWrap" hidden>
+            <input type="checkbox" id="metaMode">
+            <span><b>광고관리자 'URL 매개변수' 칸용으로 만들기</b><br><small>캠페인·광고 이름이 자동으로 들어갑니다</small></span>
+          </label>
+
+          <div class="field">
+            <span class="label"><span class="step">3</span>캠페인 <code>프로모션_상품_시작일</code></span>
             <div class="row three">
-              <label class="field"><span class="label">형식</span><select id="ctFormat"></select></label>
-              <label class="field"><span class="label">주제 (영문)</span><input type="text" id="ctTopic" list="topicList" placeholder="review"><datalist id="topicList"></datalist></label>
-              <label class="field"><span class="label">버전</span><select id="ctVersion"></select></label>
+              <select id="cPromotion" aria-label="프로모션"></select>
+              <select id="cProduct" aria-label="상품"></select>
+              <input type="date" id="cDate" aria-label="시작일">
             </div>
-            <div class="seg-preview" id="contentPreview"></div>
-          </fieldset>
-
-          <!-- 5. 타겟/키워드 -->
-          <fieldset class="block" id="termBlock">
-            <legend><span class="step">5</span>타겟 · 키워드 <em class="req">선택</em> <button type="button" class="help" data-help="term">?</button></legend>
-            <div class="row" id="termTargetRow">
-              <label class="field"><span class="label">타겟 유형</span><select id="tType"></select></label>
-              <label class="field grow"><span class="label">세부 (영문)</span><input type="text" id="tDetail" placeholder="purchase, cart_7d ..."></label>
-            </div>
-            <label class="field" id="termKeywordRow" hidden>
-              <span class="label">검색 키워드</span>
-              <input type="text" id="tKeyword" placeholder="손목보호대">
-            </label>
-            <span class="hint" id="termHint"></span>
-          </fieldset>
-
-          <!-- 6. 메모 -->
-          <fieldset class="block">
-            <legend><span class="step">6</span>메모 <em class="req">선택 · 기록용</em></legend>
-            <input type="text" id="memo" placeholder="예: 11월 블프 메타 영상 소재 1차">
-          </fieldset>
-
-          <div class="form-actions">
-            <button type="button" class="btn ghost" id="resetBtn">초기화</button>
           </div>
+
+          <label class="field" id="contentWrap">
+            <span class="label"><span class="step">4</span>소재명 <em class="req" id="contentReq">선택</em></span>
+            <div class="prefix-input">
+              <span class="prefix" id="contentPrefix" hidden></span>
+              <input type="text" id="content" placeholder="예: video_doctor">
+            </div>
+            <span class="hint" id="contentHint">영문으로 입력 (한글·공백은 자동 정리)</span>
+          </label>
         </form>
 
         <!-- 결과 -->
@@ -129,83 +80,67 @@
               <span class="status" id="statusBadge"></span>
             </div>
             <div class="url-out" id="urlOut"><span class="placeholder">왼쪽 항목을 채우면 여기에 URL이 만들어집니다.</span></div>
-            <div class="meta-out" id="metaOut" hidden>
-              <div class="mini-label">웹사이트 URL (광고관리자 '웹사이트 URL' 칸)</div>
+            <div id="metaOut" hidden>
+              <div class="mini-label">웹사이트 URL 칸</div>
               <div class="url-out small" id="metaWebsite"></div>
-              <div class="mini-label">URL 매개변수 (광고관리자 '추적 > URL 매개변수' 칸)</div>
+              <div class="mini-label">URL 매개변수 칸</div>
               <div class="url-out small" id="metaParams"></div>
             </div>
+            <ul class="checks" id="checkList"></ul>
             <div class="actions">
               <button type="button" class="btn primary" id="copyBtn" disabled>URL 복사</button>
-              <button type="button" class="btn" id="qrBtn" disabled>QR 코드</button>
-              <button type="button" class="btn" id="openBtn" disabled>새 탭 열기</button>
+              <button type="button" class="btn" id="shortBtn" disabled>단축 URL</button>
+              <button type="button" class="btn" id="qrBtn" disabled>QR</button>
             </div>
-            <div class="short-box" id="shortBox" hidden>
-              <div class="short-row">
-                <input type="text" id="shortName" placeholder="단축 주소 이름 (선택 · 예: ficor_insta)" maxlength="30">
-                <button type="button" class="btn" id="shortBtn">단축 URL 만들기</button>
-              </div>
-              <div class="short-out" id="shortOut" hidden>
-                <a id="shortLink" href="#" target="_blank" rel="noopener"></a>
-                <button type="button" class="btn small primary" id="shortCopy">단축 URL 복사</button>
-              </div>
-              <p class="hint">인스타 · 스레드 프로필처럼 링크가 그대로 보이는 곳에 사용하세요. 단축 URL을 눌러도 원래 URL의 utm 값이 그대로 전달됩니다. (is.gd 무료 서비스 · 만든 뒤 수정·삭제 불가)</p>
+            <div class="short-out" id="shortOut" hidden>
+              <a id="shortLink" href="#" target="_blank" rel="noopener"></a>
+              <button type="button" class="btn small primary" id="shortCopy">복사</button>
             </div>
             <div class="qr-box" id="qrBox" hidden>
               <div id="qrImg"></div>
               <button type="button" class="btn small" id="qrDownload">PNG 저장</button>
             </div>
-            <ul class="checks" id="checkList"></ul>
           </div>
-          <div class="param-table" id="paramTable"></div>
         </aside>
       </div>
     </section>
 
-    <!-- ② URL 검사 ──────────────────────────────────── -->
+    <!-- ② URL 검사 -->
     <section class="panel" id="tab-inspect">
       <div class="card">
         <h2 class="sec">URL 검사</h2>
-        <p class="lead">이미 배포된 링크를 붙여넣으면 파라미터를 분해해 규칙 위반을 표시합니다.</p>
+        <p class="lead">이미 배포된 링크를 붙여넣으면 규칙에 맞지 않는 부분만 알려줍니다.</p>
         <div class="row">
-          <label class="field grow"><input type="text" id="inspectInput" placeholder="https://ficor.kr/?utm_source=..."></label>
+          <input type="text" id="inspectInput" placeholder="https://ficor.kr/?utm_source=...">
           <button type="button" class="btn primary" id="inspectBtn">검사</button>
         </div>
         <div id="inspectOut"></div>
       </div>
     </section>
 
-    <!-- ③ 생성 기록 ──────────────────────────────────── -->
+    <!-- ③ 생성 기록 -->
     <section class="panel" id="tab-history">
       <div class="card">
         <div class="hist-head">
           <h2 class="sec">생성 기록</h2>
           <div class="hist-tools">
-            <input type="search" id="histSearch" placeholder="캠페인 · 매체 · 메모 검색">
-            <button type="button" class="btn" id="histCsv">CSV 내보내기</button>
+            <input type="search" id="histSearch" placeholder="검색">
+            <button type="button" class="btn" id="histCsv">CSV</button>
             <button type="button" class="btn ghost danger" id="histClear">전체 삭제</button>
           </div>
         </div>
-        <p class="lead">URL을 복사하면 자동 저장됩니다. 기록은 <b>이 브라우저에만</b> 보관되므로 필요하면 CSV로 내보내 공유 폴더에 보관하세요.</p>
+        <p class="lead">복사한 링크가 자동 저장됩니다. 이 브라우저에만 보관됩니다.</p>
         <div id="histOut"></div>
       </div>
     </section>
 
-    <!-- ④ 작성 가이드 ──────────────────────────────────── -->
+    <!-- ④ 작성 가이드 -->
     <section class="panel" id="tab-guide">
-      <div class="guide-layout">
-        <nav class="toc" id="guideToc"></nav>
-        <article class="card guide" id="guideOut"></article>
-      </div>
+      <article class="card guide" id="guideOut"></article>
     </section>
 
   </main>
 
-  <!-- 인라인 가이드 팝오버 -->
-  <div class="popover" id="popover" hidden>
-    <div class="popover-body" id="popoverBody"></div>
-    <button type="button" class="link-btn" id="popoverMore">작성 가이드에서 자세히 보기 →</button>
-  </div>
   <div class="toast" id="toast"></div>
 
   <script src="presets.js"></script>
