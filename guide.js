@@ -91,6 +91,20 @@
         <p class="note">매크로는 광고관리자에 적힌 이름을 그대로 가져오므로, 광고관리자 이름도 이 가이드 규칙대로 지어야 GA4에서 깔끔하게 보입니다.</p>`
     },
     {
+      id: "g-profile", title: "프로필 링크 · 단축 URL",
+      html: `
+        <p>인스타그램 · 스레드 프로필(바이오) 링크도 utm을 붙여야 GA4에서 '프로필을 통해 들어온 방문'으로 따로 집계됩니다. utm 없이 넣으면 <code>l.instagram.com</code> 같은 추천 유입으로 섞여 들어옵니다.</p>
+        ${table(["위치", "source / medium", "campaign", "content"], [
+          ["인스타 프로필 링크", `${code("instagram")} / ${code("social")}`, code("brand_all_always_261027"), code("profile_main_v1")],
+          ["스레드 프로필 링크", `${code("threads")} / ${code("social")}`, code("brand_all_always_261027"), code("profile_main_v1")],
+          ["프로필 링크를 이벤트용으로 잠시 교체", `${code("instagram")} / ${code("social")}`, code("conversion_wrist_bf_261121"), code("profile_event_v1")],
+          ["스토리 링크 스티커", `${code("instagram")} / ${code("social")}`, "해당 캠페인 이름", code("story_주제_v1")]
+        ])}
+        <h4>단축 URL</h4>
+        <p>프로필처럼 링크가 그대로 노출되는 곳은 생성 탭의 <b>'단축 URL 만들기'</b>로 짧게 바꿔 넣습니다. 단축 URL을 누르면 원래 URL로 이동하면서 utm 값이 그대로 전달되므로 GA4 집계는 동일합니다. '단축 주소 이름'을 입력하면 <code>is.gd/ficor_insta</code>처럼 알아보기 쉬운 주소로 만들 수 있습니다(영문·숫자·밑줄 5~30자, 이미 사용 중인 이름은 불가).</p>
+        <p class="note">한 번 만든 단축 URL은 수정·삭제할 수 없습니다. 링크 내용이 바뀌면 버전(v2)을 올려 새로 만듭니다.</p>`
+    },
+    {
       id: "g-channel", title: "판매 채널별 처리",
       html: table(["랜딩", "처리", "확인 위치"], [
         ["자사몰", "utm 파라미터 생성", "GA4"],

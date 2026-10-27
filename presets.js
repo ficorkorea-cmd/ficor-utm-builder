@@ -9,7 +9,7 @@
  *  - 이미 사용 중인 code 는 삭제하지 말고 deprecated: true 로 표시 (과거 데이터 해석용)
  */
 window.UTM_PRESETS = {
-  version: "1.0.0",
+  version: "1.1.0",
 
   /* ── 랜딩 도메인 ─────────────────────────── */
   domains: {
@@ -122,7 +122,10 @@ window.UTM_PRESETS = {
       { code: "video", label: "영상" },
       { code: "carousel", label: "슬라이드" },
       { code: "banner", label: "배너" },
-      { code: "text", label: "텍스트 (메시지)" }
+      { code: "text", label: "텍스트 (메시지)" },
+      { code: "profile", label: "프로필 링크 (바이오)" },
+      { code: "story", label: "스토리 링크 스티커" },
+      { code: "highlight", label: "하이라이트" }
     ],
     topicExamples: [
       { code: "review", label: "후기" },
@@ -130,7 +133,9 @@ window.UTM_PRESETS = {
       { code: "usp", label: "제품 특장점" },
       { code: "price", label: "가격·혜택" },
       { code: "ugc", label: "고객 제작 콘텐츠" },
-      { code: "coupon", label: "쿠폰 안내" }
+      { code: "coupon", label: "쿠폰 안내" },
+      { code: "main", label: "메인 (프로필 기본 링크)" },
+      { code: "event", label: "이벤트 안내" }
     ]
   },
 
@@ -149,6 +154,9 @@ window.UTM_PRESETS = {
     { situation: "토스애즈 신년 세트 할인", source: "toss", medium: "display", campaign: "conversion_set_newyear_261229", content: "image_price_v2", term: "broad" },
     { situation: "크리에이터 공동구매", source: "fit_jenny", medium: "influencer", campaign: "conversion_set_groupbuy_261103", content: "video_ugc_v1", term: "" },
     { situation: "카카오 채널 기존 고객 쿠폰", source: "kakao", medium: "message", campaign: "crm_all_sale_261115", content: "text_coupon_v1", term: "" },
+    { situation: "인스타 프로필 링크 (상시)", source: "instagram", medium: "social", campaign: "brand_all_always_261027", content: "profile_main_v1", term: "" },
+    { situation: "스레드 프로필 링크 (상시)", source: "threads", medium: "social", campaign: "brand_all_always_261027", content: "profile_main_v1", term: "" },
+    { situation: "인스타 스토리 블프 안내", source: "instagram", medium: "social", campaign: "conversion_wrist_bf_261121", content: "story_event_v1", term: "" },
     { situation: "인스타 비밀링크 시크릿 상품", source: "instagram", medium: "social", campaign: "conversion_wrist_secret_261121", content: "image_usp_v1", term: "" }
   ],
 
@@ -163,6 +171,7 @@ window.UTM_PRESETS = {
 
   /* ── 변경 이력 ────────────────────────────── */
   changelog: [
-    { date: "2026-10-27", text: "최초 규칙 제정 (업계 표준 구조 기준)" }
+    { date: "2026-10-27", text: "최초 규칙 제정 (업계 표준 구조 기준)" },
+    { date: "2026-10-27", text: "프로필·스토리 링크 소재 형식 추가 (profile, story, highlight), 단축 URL 기능 추가" }
   ]
 };

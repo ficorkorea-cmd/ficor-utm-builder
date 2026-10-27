@@ -8,6 +8,7 @@
   const META_MACROS = { campaign: "{{campaign.name}}", content: "{{ad.name}}", term: "{{adset.name}}" };
 
   let current = null; // 마지막 생성 결과
+  let short = { url: "", for: "" }; // 단축 URL (for = 원본 URL)
 
   /* ── 공통 유틸 ─────────────────────────────── */
   function opt(list, placeholder, labelFn) {
@@ -276,6 +277,10 @@
     $("qrBtn").disabled = !res.ready || isMeta;
     $("openBtn").disabled = !res.ready || isMeta;
     $("qrBox").hidden = true;
+    $("shortBox").hidden = !res.ready || isMeta;
+    const hasShort = res.ready && short.for === res.url && short.url;
+    $("shortOut").hidden = !hasShort;
+    if (hasShort) { $("shortLink").href = short.url; $("shortLink").textContent = short.url; }
 
     const hasErr = res.checks.some((c) => c.level === "error");
     const hasWarn = res.checks.some((c) => c.level === "warn");
@@ -309,6 +314,7 @@
       content: v.metaMode ? META_MACROS.content : v.content,
       term: v.metaMode ? META_MACROS.term : v.term,
       url: key, metaMode: v.metaMode, metaParams: res.metaParams || "",
+      shortUrl: short.for === key && short.url ? short.url : idx >= 0 ? list[idx].shortUrl || "" : "",
       memo: v.memo,
       form: snapshotForm()
     };
@@ -340,21 +346,23 @@
 
   function renderHistory() {
     const q = $("histSearch").value.trim().toLowerCase();
-    const list = loadHist().filter((x) => !q || [x.campaign, x.campaignName, x.source, x.medium, x.content, x.term, x.memo, x.landing].join(" ").toLowerCase().includes(q));
+    const list = loadHist().filter((x) => !q || [x.campaign, x.campaignName, x.source, x.medium, x.content, x.term, x.memo, x.landing, x.shortUrl].join(" ").toLowerCase().includes(q));
     if (!list.length) {
       $("histOut").innerHTML = `<div class="empty">${q ? "검색 결과가 없습니다." : "아직 생성한 링크가 없습니다."}</div>`;
       return;
     }
-    $("histOut").innerHTML = `<div class="tbl-wrap"><table class="tbl hist"><thead><tr><th>생성일시</th><th>source / medium</th><th>campaign</th><th>content</th><th>term</th><th>메모</th><th></th></tr></thead><tbody>${list.map((x) => `
+    $("histOut").innerHTML = `<div class="tbl-wrap"><table class="tbl hist"><thead><tr><th>생성일시</th><th>source / medium</th><th>campaign</th><th>content</th><th>term</th><th>단축 URL</th><th>메모</th><th></th></tr></thead><tbody>${list.map((x) => `
       <tr data-id="${esc(x.id)}">
         <td class="nowrap">${fmtDate(x.at)}${x.dest === "smartstore" ? '<div class="pill small">스마트스토어</div>' : ""}${x.metaMode ? '<div class="pill small">메타 매개변수</div>' : ""}</td>
         <td><code>${esc(x.source)}</code> / <code>${esc(x.medium)}</code></td>
         <td><code>${esc(x.metaMode ? x.campaignName : x.campaign)}</code></td>
         <td>${x.content ? `<code>${esc(x.content)}</code>` : '<span class="muted">—</span>'}</td>
         <td>${x.term ? `<code>${esc(x.term)}</code>` : '<span class="muted">—</span>'}</td>
+        <td>${x.shortUrl ? `<a class="short-link" href="${esc(x.shortUrl)}" target="_blank" rel="noopener">${esc(x.shortUrl.replace(/^https?:\/\//, ""))}</a>` : '<span class="muted">—</span>'}</td>
         <td>${esc(x.memo) || '<span class="muted">—</span>'}</td>
         <td class="nowrap row-actions">
           <button class="btn small" data-act="copy">복사</button>
+          ${x.shortUrl ? '<button class="btn small" data-act="copyShort">단축 복사</button>' : ""}
           <button class="btn small ghost" data-act="load">불러오기</button>
           <button class="btn small ghost danger" data-act="del" aria-label="삭제">삭제</button>
         </td>
@@ -364,9 +372,9 @@
   function exportCsv() {
     const list = loadHist();
     if (!list.length) return toast("내보낼 기록이 없습니다.");
-    const head = ["생성일시", "랜딩 구분", "랜딩 URL", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "완성 URL", "메타 URL 매개변수", "메모"];
+    const head = ["생성일시", "랜딩 구분", "랜딩 URL", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "완성 URL", "단축 URL", "메타 URL 매개변수", "메모"];
     const q = (s) => `"${String(s ?? "").replace(/"/g, '""')}"`;
-    const rows = list.map((x) => [fmtDate(x.at), { mall: "자사몰", smartstore: "스마트스토어", other: "기타" }[x.dest] || x.dest, x.landing, x.source, x.medium, x.metaMode ? x.campaignName : x.campaign, x.content, x.term, x.metaMode ? "" : x.url, x.metaParams, x.memo].map(q).join(","));
+    const rows = list.map((x) => [fmtDate(x.at), { mall: "자사몰", smartstore: "스마트스토어", other: "기타" }[x.dest] || x.dest, x.landing, x.source, x.medium, x.metaMode ? x.campaignName : x.campaign, x.content, x.term, x.metaMode ? "" : x.url, x.shortUrl || "", x.metaParams, x.memo].map(q).join(","));
     const csv = "﻿" + [head.map(q).join(","), ...rows].join("\r\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
@@ -376,6 +384,10 @@
   }
 
   /* ── QR ─────────────────────────────────────── */
+  function qrTarget() {
+    return short.for === current.res.url && short.url ? short.url : current.res.url;
+  }
+
   function makeQr(text) {
     const qr = qrcode(0, "M");
     qr.addData(text);
@@ -386,14 +398,14 @@
   function showQr() {
     if (!current) return;
     if (typeof qrcode === "undefined") return toast("QR 라이브러리를 불러오지 못했습니다. 네트워크를 확인하세요.");
-    const qr = makeQr(current.res.url);
+    const qr = makeQr(qrTarget());
     $("qrImg").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
     $("qrBox").hidden = false;
   }
 
   function downloadQr() {
     if (!current || typeof qrcode === "undefined") return;
-    const qr = makeQr(current.res.url);
+    const qr = makeQr(qrTarget());
     const n = qr.getModuleCount(), cell = 12, margin = 4;
     const size = (n + margin * 2) * cell;
     const c = document.createElement("canvas");
@@ -406,6 +418,53 @@
     a.href = c.toDataURL("image/png");
     a.download = `qr_${current.v.campaign || "utm"}${current.v.content ? "_" + current.v.content : ""}.png`;
     a.click();
+  }
+
+  /* ── 단축 URL (is.gd) ───────────────────────── */
+  const SHORT_ERRORS = {
+    1: "URL이 올바르지 않거나 단축 서비스에서 허용하지 않는 주소입니다.",
+    2: "단축 주소 이름이 이미 사용 중이거나 형식이 맞지 않습니다. 다른 이름을 입력하세요.",
+    3: "단축 요청이 너무 많습니다. 잠시 후 다시 시도하세요.",
+    4: "단축 서비스에 일시적인 문제가 있습니다. 잠시 후 다시 시도하세요."
+  };
+
+  function shortenUrl(longUrl, custom) {
+    return new Promise((resolve, reject) => {
+      const cb = "__isgd_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const script = document.createElement("script");
+      const done = () => { clearTimeout(timer); try { delete window[cb]; } catch (e) { window[cb] = undefined; } script.remove(); };
+      const timer = setTimeout(() => { done(); reject(new Error("단축 서비스에 연결하지 못했습니다. 네트워크(사내 방화벽 등)를 확인하세요.")); }, 10000);
+      window[cb] = (data) => {
+        done();
+        if (data && data.shorturl) resolve(data.shorturl);
+        else reject(new Error(SHORT_ERRORS[data && data.errorcode] || (data && data.errormessage) || "단축 URL을 만들지 못했습니다."));
+      };
+      const params = new URLSearchParams({ format: "json", url: longUrl, callback: cb });
+      if (custom) params.set("shorturl", custom);
+      script.src = "https://is.gd/create.php?" + params.toString();
+      script.onerror = () => { done(); reject(new Error("단축 서비스에 연결하지 못했습니다. 네트워크(사내 방화벽 등)를 확인하세요.")); };
+      document.head.appendChild(script);
+    });
+  }
+
+  async function onShorten() {
+    if (!current || current.v.metaMode) return;
+    const custom = $("shortName").value.trim();
+    if (custom && !/^[A-Za-z0-9_]{5,30}$/.test(custom)) return toast("단축 주소 이름은 영문·숫자·밑줄 5~30자로 입력하세요.");
+    const btn = $("shortBtn");
+    const longUrl = current.res.url;
+    btn.disabled = true; btn.textContent = "만드는 중…";
+    try {
+      const url = await shortenUrl(longUrl, custom);
+      short = { url, for: longUrl };
+      if (current && current.res.url === longUrl) addHistory(current.v, current.res);
+      update();
+      toast("단축 URL을 만들었습니다.");
+    } catch (e) {
+      toast(e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = "단축 URL 만들기";
+    }
   }
 
   /* ── 검사 탭 ────────────────────────────────── */
@@ -479,6 +538,14 @@
       await copyText(v.campaign);
       toast("캠페인 이름을 복사했습니다.");
     });
+    $("shortBtn").addEventListener("click", onShorten);
+    $("shortName").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); onShorten(); } });
+    $("shortCopy").addEventListener("click", async () => {
+      if (!current || short.for !== current.res.url) return;
+      await copyText(short.url);
+      addHistory(current.v, current.res);
+      toast("단축 URL을 복사했습니다.");
+    });
     $("qrBtn").addEventListener("click", () => ($("qrBox").hidden ? showQr() : ($("qrBox").hidden = true)));
     $("qrDownload").addEventListener("click", () => { downloadQr(); if (current) addHistory(current.v, current.res); });
     $("openBtn").addEventListener("click", () => current && window.open(current.res.url, "_blank", "noopener"));
@@ -505,6 +572,7 @@
       const x = list.find((i) => i.id === id);
       if (!x) return;
       if (btn.dataset.act === "copy") { await copyText(x.metaMode ? x.metaParams : x.url); toast("복사했습니다."); }
+      if (btn.dataset.act === "copyShort") { await copyText(x.shortUrl); toast("단축 URL을 복사했습니다."); }
       if (btn.dataset.act === "load") { showTab("build"); restoreForm(x.form || {}); toast("생성 탭에 불러왔습니다."); }
       if (btn.dataset.act === "del") { saveHist(list.filter((i) => i.id !== id)); renderHistory(); }
     });

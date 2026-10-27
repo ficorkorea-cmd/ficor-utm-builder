@@ -140,6 +140,17 @@
               <button type="button" class="btn" id="qrBtn" disabled>QR 코드</button>
               <button type="button" class="btn" id="openBtn" disabled>새 탭 열기</button>
             </div>
+            <div class="short-box" id="shortBox" hidden>
+              <div class="short-row">
+                <input type="text" id="shortName" placeholder="단축 주소 이름 (선택 · 예: ficor_insta)" maxlength="30">
+                <button type="button" class="btn" id="shortBtn">단축 URL 만들기</button>
+              </div>
+              <div class="short-out" id="shortOut" hidden>
+                <a id="shortLink" href="#" target="_blank" rel="noopener"></a>
+                <button type="button" class="btn small primary" id="shortCopy">단축 URL 복사</button>
+              </div>
+              <p class="hint">인스타 · 스레드 프로필처럼 링크가 그대로 보이는 곳에 사용하세요. 단축 URL을 눌러도 원래 URL의 utm 값이 그대로 전달됩니다. (is.gd 무료 서비스 · 만든 뒤 수정·삭제 불가)</p>
+            </div>
             <div class="qr-box" id="qrBox" hidden>
               <div id="qrImg"></div>
               <button type="button" class="btn small" id="qrDownload">PNG 저장</button>
