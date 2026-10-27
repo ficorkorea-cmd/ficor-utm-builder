@@ -268,3 +268,4 @@ select:disabled { background: var(--line-2); color: var(--muted); }
   .row.two-one { grid-template-columns: 1fr; }
 }
 .form .label em.req:not(.on) { color: var(--muted); background: var(--line-2); }
+.short-hint { margin: 10px 0 0; }

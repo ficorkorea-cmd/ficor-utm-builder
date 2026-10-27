@@ -120,7 +120,7 @@
         .forEach(([k, val]) => val && u.searchParams.set(k, val));
     }
     res.url = u.toString();
-    if (v.ch.short && short.for !== res.url) res.checks.push({ level: "info", text: "링크가 그대로 노출되는 위치입니다. '단축 URL'로 짧게 만들어 넣으세요." });
+    if (v.ch.short && short.for !== res.url) res.checks.push({ level: "info", text: "링크 주소가 그대로 보이는 위치라 단축 URL 사용을 권장합니다. (선택)" });
     if (v.ch.qr) res.checks.push({ level: "info", text: "오프라인용입니다. 'QR' 버튼으로 이미지를 저장하세요. (단축 URL을 먼저 만들면 QR이 더 단순해집니다)" });
     res.ready = true;
     return res;
@@ -204,6 +204,7 @@
     $("copyBtn").textContent = isMeta ? "URL 매개변수 복사" : "URL 복사";
     $("shortBtn").disabled = $("qrBtn").disabled = !res.ready || isMeta;
     $("qrBox").hidden = true;
+    $("shortHint").hidden = !res.ready || isMeta || !!(short.for === res.url && short.url);
 
     const hasShort = res.ready && short.for === res.url && short.url;
     $("shortOut").hidden = !hasShort;
@@ -305,7 +306,7 @@
       addHistory();
       toast("단축 URL을 만들고 복사했습니다.");
     } catch (e) { toast(e.message); }
-    finally { btn.textContent = "단축 URL"; update(); }
+    finally { btn.textContent = "단축 URL 만들기"; update(); }
   }
 
   /* ── QR ── */
