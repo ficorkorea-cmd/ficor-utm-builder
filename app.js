@@ -54,7 +54,6 @@
     $("cProduct").innerHTML = opts(P.products, "전 상품", true);
     $("cFormat").innerHTML = opts(P.formats, "형식");
     $("tType").innerHTML = opts(P.targets, "선택 안 함");
-    $("cDate").value = todayISO();
   }
 
   /* ── 값 수집 ── */
@@ -65,8 +64,8 @@
     const name = R.sanitize($("cName").value);
     const format = fixed || $("cFormat").value;
     const content = name && format ? `${name}_${format}` : fixed ? (name ? `${name}_${fixed}` : fixed) : "";
-    const camp = [yymmdd($("cDate").value), $("cObjective").value, $("cPromotion").value];
-    const campaign = camp.every(Boolean) ? [...camp, $("cProduct").value].filter(Boolean).join("_") : "";
+    const campaign = $("cObjective").value && $("cPromotion").value
+      ? [yymmdd($("cDate").value), $("cObjective").value, $("cPromotion").value, $("cProduct").value].filter(Boolean).join("_") : "";
     let term = "";
     if (ch && ch.term === "keyword") term = $("tKeyword").value.trim();
     else if (ch && ch.term === "target" && $("tType").value) {

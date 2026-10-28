@@ -35,10 +35,14 @@
     if (!v) return [{ level: "error", text: `${key}이 없습니다.` }];
     if (isMacro(v)) return [];
     if (!CODE_RE.test(v)) return [{ level: "error", text: `${key} "${v}" — 영문 소문자·숫자·밑줄만 사용` }];
-    const s = v.split("_");
-    if (s.length < 3 || s.length > 4) return [{ level: "error", text: `${key} "${v}" — 규칙: 시작일_목적_프로모션(_상품)` }];
+    let s = v.split("_");
     const out = [];
-    if (!isValidYYMMDD(s[0])) out.push({ level: "error", text: `시작일 "${s[0]}" — YYMMDD 형식 (예: 261121)` });
+    if (/^\d+$/.test(s[0])) {
+      if (!isValidYYMMDD(s[0])) out.push({ level: "error", text: `날짜 "${s[0]}" — YYMMDD 형식 (예: 261121)` });
+      s = s.slice(1);
+    }
+    if (s.length < 2 || s.length > 3) return [{ level: "error", text: `${key} "${v}" — 규칙: (날짜_)목적_프로모션(_상품)` }];
+    s = ["", ...s];
     if (!codes(P.objectives).includes(s[1])) out.push({ level: "error", text: `목적 "${s[1]}" — 허용: ${codes(P.objectives).join(", ")}` });
     if (!codes(P.promotions).includes(s[2])) out.push({ level: "error", text: `프로모션 "${s[2]}" — 허용: ${codes(P.promotions).join(", ")}` });
     if (s[3] && !codes(P.products).includes(s[3])) out.push({ level: "error", text: `상품 "${s[3]}" — 허용: ${codes(P.products).join(", ")}` });

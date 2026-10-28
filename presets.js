@@ -45,7 +45,7 @@ window.UTM_PRESETS = {
     { group: "UTM 불가", id: "internal", label: "자사몰 내부 배너 · 버튼", status: "forbidden", reason: "내부 링크에 UTM을 넣으면 고객의 원래 유입 경로(광고·SNS 등)가 덮어써져 성과가 사라집니다.", alt: "내부 클릭은 GA4 이벤트로 측정합니다. UTM은 넣지 마세요." }
   ],
 
-  /* utm_campaign = 시작일_목적_프로모션(_상품) */
+  /* utm_campaign = (날짜_)목적_프로모션(_상품) — 날짜·상품은 선택 */
   objectives: [
     { code: "conversion", label: "구매 전환" },
     { code: "acquisition", label: "신규 유입" },
@@ -93,15 +93,16 @@ window.UTM_PRESETS = {
   examples: [
     { situation: "메타 블프 손목 영상 광고", channel: "meta_ad", campaign: "261121_conversion_bf_wrist", content: "doctor_video", term: "lookalike_purchase" },
     { situation: "토스애즈 신년 세트 이미지", channel: "toss", campaign: "261229_conversion_newyear_set", content: "price_image", term: "broad" },
-    { situation: "네이버 파워링크", channel: "naver_sa", campaign: "261101_acquisition_always", content: "", term: "손목보호대" },
-    { situation: "인스타 프로필 링크 (상시)", channel: "ig_profile", campaign: "261027_brand_always", content: "profile", term: "" },
+    { situation: "네이버 파워링크", channel: "naver_sa", campaign: "acquisition_always", content: "", term: "손목보호대" },
+    { situation: "인스타 프로필 링크 (상시)", channel: "ig_profile", campaign: "brand_always", content: "profile", term: "" },
     { situation: "인스타 스토리 블프 안내", channel: "ig_story", campaign: "261121_conversion_bf", content: "event_story", term: "" },
     { situation: "카카오 쿠폰 메시지", channel: "kakao", campaign: "261115_crm_sale", content: "coupon_text", term: "" },
-    { situation: "패키지 동봉 QR", channel: "offline", campaign: "261101_crm_always", content: "review_package", term: "" }
+    { situation: "패키지 동봉 QR", channel: "offline", campaign: "crm_always", content: "review_package", term: "" }
   ],
 
   changelog: [
     { date: "2026-10-27", text: "최초 규칙 제정" },
-    { date: "2026-10-27", text: "이커머스(DTC) 표준 구조 적용: 캠페인 = 시작일_목적_프로모션(_상품), 소재 = 소재명_형식, 타겟 = 타겟유형_세부 / UTM 불가 위치 안내 추가" }
+    { date: "2026-10-27", text: "이커머스(DTC) 표준 구조 적용: 캠페인 = 시작일_목적_프로모션(_상품), 소재 = 소재명_형식, 타겟 = 타겟유형_세부 / UTM 불가 위치 안내 추가" },
+    { date: "2026-10-28", text: "캠페인 날짜를 선택 항목으로 변경 (상시 링크는 날짜 없이 생성)" }
   ]
 };

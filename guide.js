@@ -16,7 +16,7 @@
       title: "사용 방법",
       html: `<div class="summary"><ul>
         <li>랜딩 URL 붙여넣기 → 링크를 거는 위치 선택 → (광고면) 소재명·형식 입력 → 복사</li>
-        <li>캠페인 칸은 기본값(오늘 · 구매 전환 · 상시)이 채워져 있어, 행사나 목적이 다를 때만 바꾸면 됩니다.</li>
+        <li>캠페인의 목적·프로모션은 기본값(구매 전환 · 상시)이 채워져 있어, 다를 때만 바꾸면 됩니다. 날짜·상품은 선택입니다.</li>
         <li>모든 링크는 필요할 때 <b>'단축 URL 만들기'</b>로 줄일 수 있습니다(선택). 프로필·스토리처럼 주소가 그대로 보이는 곳은 단축을 권장하고, 오프라인은 <b>QR</b>을 사용합니다.</li>
         <li>UTM을 넣을 수 없는 위치를 고르면 링크 대신 확인 방법을 안내합니다.</li>
       </ul></div>`
@@ -26,7 +26,7 @@
       html: table(["파라미터", "구조", "예시", "입력"], [
         [code("utm_source"), "매체", code("facebook"), "위치 선택 시 자동"],
         [code("utm_medium"), "활동 유형 (GA4 채널 기준)", code("paid_social"), "위치 선택 시 자동"],
-        [code("utm_campaign"), code("시작일_목적_프로모션_상품"), code("261121_conversion_bf_wrist"), "상품만 선택, 나머지 기본값 있음"],
+        [code("utm_campaign"), code("날짜_목적_프로모션_상품"), code("261121_conversion_bf_wrist"), "날짜·상품 선택, 목적·프로모션 기본값 있음"],
         [code("utm_content"), code("소재명_형식"), code("doctor_video"), "광고 매체만 필수"],
         [code("utm_term"), "광고: " + code("타겟유형_세부") + " / 검색광고: 키워드", code("lookalike_purchase"), "선택"]
       ]) + `<p class="note">이커머스(DTC) 브랜드 표준 구조를 따르며, 모든 값은 영문 소문자·숫자·밑줄(_)만 사용합니다. 같은 캠페인은 매체가 달라도 같은 캠페인 이름을 씁니다.</p>`
@@ -49,6 +49,7 @@
       html: table(["구간", "값"], [
         ["목적", codeList(P.objectives)],
         ["프로모션", codeList(P.promotions)],
+        ["날짜", `${code("YYMMDD")} 행사 시작일 <span class="muted small">(선택 · 상시 링크는 비움)</span>`],
         ["상품", codeList(P.products) + ` <span class="muted small">(전 상품이면 비움)</span>`],
         ["소재 형식", codeList(P.formats)],
         ["타겟 유형", codeList(P.targets)]
@@ -63,7 +64,7 @@
       title: "메타 광고 URL 매개변수",
       html: `<p>메타 광고를 고르면 <b>'광고관리자 URL 매개변수 칸용으로 만들기'</b>를 켤 수 있습니다. 광고관리자 이름이 그대로 utm에 들어가므로 아래 규칙으로 이름을 지어 주세요.</p>` +
         table(["광고관리자", "→ utm", "이름 규칙"], [
-          ["캠페인 이름", code("utm_campaign"), code("시작일_목적_프로모션_상품")],
+          ["캠페인 이름", code("utm_campaign"), code("날짜_목적_프로모션_상품") + " (날짜·상품 선택)"],
           ["광고세트 이름", code("utm_term"), code("타겟유형_세부")],
           ["광고 이름", code("utm_content"), code("소재명_형식")]
         ])

@@ -17,12 +17,12 @@ GA4 유입 데이터의 표기를 통일하기 위한 사내 UTM 링크 생성 �
 | 파라미터 | 구조 | 예시 |
 |---|---|---|
 | utm_source / utm_medium | 링크 위치 선택 시 자동 | `facebook` / `paid_social` |
-| utm_campaign | 시작일_목적_프로모션_상품(선택) | `261121_conversion_bf_wrist` |
+| utm_campaign | 날짜(선택)_목적_프로모션_상품(선택) | `261121_conversion_bf_wrist` / `brand_always` |
 | utm_content | 소재명_형식 (광고 매체만 필수) | `doctor_video` |
 | utm_term | 타겟유형_세부 / 검색광고는 키워드 (선택) | `lookalike_purchase` |
 
 자동 처리
-- 캠페인 기본값: 오늘 · 구매 전환 · 상시
+- 캠페인 기본값: 구매 전환 · 상시 (날짜·상품은 선택)
 - 프로필·스토리 링크는 형식 자동 고정 + 단축 URL 안내, 오프라인은 QR 안내
 - UTM 불가 위치(피드 캡션, 쇼핑검색광고, 브랜드커넥트, 쿠팡, 자사몰 내부 배너) 선택 시 링크 대신 확인 방법 안내
 - 스마트스토어 링크 → `nt_` 파라미터로 변환
