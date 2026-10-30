@@ -5,7 +5,7 @@
  *  - 이미 쓰던 값은 지우지 말고 deprecated: true 로 숨김
  */
 window.UTM_PRESETS = {
-  version: "3.0.0",
+  version: "3.1.0",
 
   domains: {
     mall: ["ficor.kr", "www.ficor.kr", "ficorkorea.imweb.me"],
@@ -37,6 +37,9 @@ window.UTM_PRESETS = {
 
     { group: "협업 · 오프라인", id: "influencer", label: "인플루언서 게시물 링크", source: "", medium: "influencer", ga4: "Unassigned (사용자 정의 채널 그룹 필요)", content: "optional", custom: true },
     { group: "협업 · 오프라인", id: "offline", label: "오프라인 QR (패키지·전단·POP)", source: "offline", medium: "qr", ga4: "Unassigned (사용자 정의 채널 그룹 필요)", content: "optional", qr: true },
+
+    { group: "콘텐츠", id: "naver_blog", label: "네이버 블로그 본문 링크 (피코밴드 공식 블로그)", source: "naver_blog", medium: "blog", ga4: "Unassigned (사용자 정의 채널 그룹 필요)", content: "required" },
+    { group: "콘텐츠", id: "naver_cafe", label: "정형외과 제휴 카페 게시글 링크", source: "naver_cafe", medium: "community", ga4: "Unassigned (사용자 정의 채널 그룹 필요)", content: "required" },
 
     { group: "UTM 불가", id: "ig_feed", label: "인스타 피드·릴스 캡션 · 댓글", status: "blocked", reason: "캡션과 댓글의 링크는 클릭되지 않습니다.", alt: "캡션에 '프로필 링크 확인'으로 안내하고 '인스타 프로필 링크'로 만드세요." },
     { group: "UTM 불가", id: "naver_shopping", label: "네이버 쇼핑검색광고", status: "blocked", reason: "랜딩이 스마트스토어 상품으로 고정되어 파라미터를 넣을 수 없습니다.", alt: "스마트스토어센터 > 통계 > 마케팅분석과 검색광고 리포트에서 확인합니다." },
@@ -97,12 +100,15 @@ window.UTM_PRESETS = {
     { situation: "인스타 프로필 링크 (상시)", channel: "ig_profile", campaign: "brand_always", content: "profile", term: "" },
     { situation: "인스타 스토리 블프 안내", channel: "ig_story", campaign: "261121_conversion_bf", content: "event_story", term: "" },
     { situation: "카카오 쿠폰 메시지", channel: "kakao", campaign: "261115_crm_sale", content: "coupon_text", term: "" },
-    { situation: "패키지 동봉 QR", channel: "offline", campaign: "crm_always", content: "review_package", term: "" }
+    { situation: "패키지 동봉 QR", channel: "offline", campaign: "crm_always", content: "review_package", term: "" },
+    { situation: "블로그 엘보 선택 가이드 글", channel: "naver_blog", campaign: "acquisition_always_elbow", content: "elbowguide_text", term: "" },
+    { situation: "제휴 카페 손목 비교 글", channel: "naver_cafe", campaign: "conversion_always_wrist", content: "cafewristcompare_text", term: "" }
   ],
 
   changelog: [
     { date: "2026-10-27", text: "최초 규칙 제정" },
     { date: "2026-10-27", text: "이커머스(DTC) 표준 구조 적용: 캠페인 = 시작일_목적_프로모션(_상품), 소재 = 소재명_형식, 타겟 = 타겟유형_세부 / UTM 불가 위치 안내 추가" },
-    { date: "2026-10-28", text: "캠페인 날짜를 선택 항목으로 변경 (상시 링크는 날짜 없이 생성)" }
+    { date: "2026-10-28", text: "캠페인 날짜를 선택 항목으로 변경 (상시 링크는 날짜 없이 생성)" },
+    { date: "2026-10-29", text: "네이버 블로그(naver_blog / blog)·정형외과 제휴 카페(naver_cafe / community) 채널 추가 — 기존 채널·단축 URL·검사 규칙 변경 없음" }
   ]
 };
