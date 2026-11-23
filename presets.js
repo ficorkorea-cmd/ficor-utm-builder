@@ -34,6 +34,7 @@ window.UTM_PRESETS = {
 
     { group: "메시지", id: "kakao", label: "카카오 채널 메시지 버튼", source: "kakao", medium: "message", ga4: "Unassigned (사용자 정의 채널 그룹 필요)", content: "optional" },
     { group: "메시지", id: "sms", label: "문자 · 알림톡", source: "sms", medium: "message", ga4: "Unassigned (사용자 정의 채널 그룹 필요)", content: "optional" },
+    { group: "메시지", id: "naver_talk", label: "네이버 톡톡 메시지 · 자동응답", source: "naver_talk", medium: "message", ga4: "Unassigned (사용자 정의 채널 그룹 필요)", content: "optional" },
 
     { group: "협업 · 오프라인", id: "influencer", label: "인플루언서 게시물 링크", source: "", medium: "influencer", ga4: "Unassigned (사용자 정의 채널 그룹 필요)", content: "optional", custom: true },
     { group: "협업 · 오프라인", id: "offline", label: "오프라인 QR (패키지·전단·POP)", source: "offline", medium: "qr", ga4: "Unassigned (사용자 정의 채널 그룹 필요)", content: "optional", qr: true },
